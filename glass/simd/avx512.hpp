@@ -2,8 +2,9 @@
 
 #if defined(__AVX512F__)
 
-#include <cstdint>
 #include <immintrin.h>
+
+#include <cstdint>
 
 namespace glass {
 
@@ -26,6 +27,6 @@ inline int32_t reduce_add_i32x16(__m512i x) {
   return _mm_extract_epi32(tmp2, 0) + _mm_extract_epi32(tmp2, 1);
 }
 
-} // namespace glass
+}  // namespace glass
 
 #endif

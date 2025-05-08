@@ -15,13 +15,14 @@ namespace glass {
 
 namespace searcher {
 
-template <typename Block = uint64_t> struct Bitset {
+template <typename Block = uint64_t>
+struct Bitset {
   constexpr static int block_size = sizeof(Block) * 8;
   int nbytes;
-  Block *data;
+  Block* data;
   explicit Bitset(int n)
       : nbytes((n + block_size - 1) / block_size * sizeof(Block)),
-        data((uint64_t *)alloc64B(nbytes)) {
+        data((uint64_t*)alloc64B(nbytes)) {
     memset(data, 0, nbytes);
   }
   ~Bitset() { free(data); }
@@ -32,26 +33,28 @@ template <typename Block = uint64_t> struct Bitset {
     return (data[i / block_size] >> (i & (block_size - 1))) & 1;
   }
 
-  void *block_address(int i) { return data + i / block_size; }
+  void* block_address(int i) { return data + i / block_size; }
 };
 
-template <typename dist_t = float> struct Neighbor {
+template <typename dist_t = float>
+struct Neighbor {
   int id;
   dist_t distance;
 
   Neighbor() = default;
   Neighbor(int id, dist_t distance) : id(id), distance(distance) {}
 
-  inline friend bool operator<(const Neighbor &lhs, const Neighbor &rhs) {
+  inline friend bool operator<(const Neighbor& lhs, const Neighbor& rhs) {
     return lhs.distance < rhs.distance ||
            (lhs.distance == rhs.distance && lhs.id < rhs.id);
   }
-  inline friend bool operator>(const Neighbor &lhs, const Neighbor &rhs) {
+  inline friend bool operator>(const Neighbor& lhs, const Neighbor& rhs) {
     return !(lhs < rhs);
   }
 };
 
-template <typename dist_t> struct MaxHeap {
+template <typename dist_t>
+struct MaxHeap {
   explicit MaxHeap(int capacity) : capacity(capacity), pool(capacity) {}
   void push(int u, dist_t dist) {
     if (size < capacity) {
@@ -88,7 +91,8 @@ template <typename dist_t> struct MaxHeap {
   std::vector<Neighbor<dist_t>, align_alloc<Neighbor<dist_t>>> pool;
 };
 
-template <typename dist_t> struct MinMaxHeap {
+template <typename dist_t>
+struct MinMaxHeap {
   explicit MinMaxHeap(int capacity) : capacity(capacity), pool(capacity) {}
   bool push(int u, dist_t dist) {
     if (cur == capacity) {
@@ -110,8 +114,7 @@ template <typename dist_t> struct MinMaxHeap {
 
   int pop_min() {
     int i = cur - 1;
-    for (; i >= 0 && pool[i].id == -1; --i)
-      ;
+    for (; i >= 0 && pool[i].id == -1; --i);
     if (i == -1) {
       return -1;
     }
@@ -133,7 +136,8 @@ template <typename dist_t> struct MinMaxHeap {
   std::vector<Neighbor<dist_t>, align_alloc<Neighbor<dist_t>>> pool;
 };
 
-template <typename dist_t> struct LinearPool {
+template <typename dist_t>
+struct LinearPool {
   LinearPool(int n, int capacity, int = 0)
       : nb(n), capacity_(capacity), data_(capacity_ + 1), vis(n) {}
 
@@ -183,7 +187,7 @@ template <typename dist_t> struct LinearPool {
 
   constexpr static int kMask = 2147483647;
   int get_id(int id) const { return id & kMask; }
-  void set_checked(int &id) { id |= 1 << 31; }
+  void set_checked(int& id) { id |= 1 << 31; }
   bool is_checked(int id) { return id >> 31 & 1; }
 
   int nb, size_ = 0, cur_ = 0, capacity_;
@@ -191,10 +195,14 @@ template <typename dist_t> struct LinearPool {
   Bitset<uint64_t> vis;
 };
 
-template <typename dist_t> struct HeapPool {
+template <typename dist_t>
+struct HeapPool {
   HeapPool(int n, int capacity, int topk)
-      : nb(n), capacity_(capacity), candidates(capacity), retset(topk), vis(n) {
-  }
+      : nb(n),
+        capacity_(capacity),
+        candidates(capacity),
+        retset(topk),
+        vis(n) {}
   bool insert(int u, dist_t dist) {
     retset.push(u, dist);
     return candidates.push(u, dist);
@@ -209,7 +217,7 @@ template <typename dist_t> struct HeapPool {
   Bitset<uint64_t> vis;
 };
 
-} // namespace searcher
+}  // namespace searcher
 
 struct Neighbor {
   int id;
@@ -220,7 +228,7 @@ struct Neighbor {
   Neighbor(int id, float distance, bool f)
       : id(id), distance(distance), flag(f) {}
 
-  inline bool operator<(const Neighbor &other) const {
+  inline bool operator<(const Neighbor& other) const {
     return distance < other.distance;
   }
 };
@@ -232,12 +240,12 @@ struct Node {
   Node() = default;
   Node(int id, float distance) : id(id), distance(distance) {}
 
-  inline bool operator<(const Node &other) const {
+  inline bool operator<(const Node& other) const {
     return distance < other.distance;
   }
 };
 
-inline int insert_into_pool(Neighbor *addr, int K, Neighbor nn) {
+inline int insert_into_pool(Neighbor* addr, int K, Neighbor nn) {
   // find the location to insert
   int left = 0, right = K - 1;
   if (addr[left].distance > nn.distance) {
@@ -276,4 +284,4 @@ inline int insert_into_pool(Neighbor *addr, int K, Neighbor nn) {
   return right;
 }
 
-} // namespace glass
+}  // namespace glass

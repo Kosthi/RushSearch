@@ -19,15 +19,15 @@
 namespace glass {
 
 struct SearcherBase {
-  virtual void SetData(const float *data, int n, int dim) = 0;
+  virtual void SetData(const float* data, int n, int dim) = 0;
   virtual void Optimize(int num_threads = 0) = 0;
-  virtual void Search(const float *q, int k, int *dst) const = 0;
+  virtual void Search(const float* q, int k, int* dst) const = 0;
   virtual void SetEf(int ef) = 0;
   virtual ~SearcherBase() = default;
 };
 
-template <typename Quantizer> struct Searcher : public SearcherBase {
-
+template <typename Quantizer>
+struct Searcher : public SearcherBase {
   int d;
   int nb;
   Graph<int> graph;
@@ -49,9 +49,9 @@ template <typename Quantizer> struct Searcher : public SearcherBase {
   std::vector<float> optimize_queries;
   const int graph_po;
 
-  Searcher(const Graph<int> &graph) : graph(graph), graph_po(graph.K / 16) {}
+  Searcher(const Graph<int>& graph) : graph(graph), graph_po(graph.K / 16) {}
 
-  void SetData(const float *data, int n, int dim) override {
+  void SetData(const float* data, int n, int dim) override {
     this->nb = n;
     this->d = dim;
     quant = Quantizer(d);
@@ -86,7 +86,7 @@ template <typename Quantizer> struct Searcher : public SearcherBase {
     std::iota(try_pls.begin(), try_pls.end(), 1);
     std::vector<int> dummy_dst(kTryK);
     printf("=============Start optimization=============\n");
-    { // warmup
+    {  // warmup
 #pragma omp parallel for schedule(dynamic) num_threads(num_threads)
       for (int i = 0; i < sample_points_num; ++i) {
         Search(optimize_queries.data() + i * d, kTryK, dummy_dst.data());
@@ -123,15 +123,16 @@ template <typename Quantizer> struct Searcher : public SearcherBase {
     }
     auto ed = std::chrono::high_resolution_clock::now();
     float baseline_ela = std::chrono::duration<double>(ed - st).count();
-    printf("settint best po = %d, best pl = %d\n"
-           "gaining %.2f%% performance improvement\n============="
-           "Done optimization=============\n",
-           best_po, best_pl, 100.0 * (baseline_ela / min_ela - 1));
+    printf(
+        "settint best po = %d, best pl = %d\n"
+        "gaining %.2f%% performance improvement\n============="
+        "Done optimization=============\n",
+        best_po, best_pl, 100.0 * (baseline_ela / min_ela - 1));
     this->po = best_po;
     this->pl = best_pl;
   }
 
-  void Search(const float *q, int k, int *dst) const override {
+  void Search(const float* q, int k, int* dst) const override {
     auto computer = quant.get_computer(q);
     searcher::LinearPool<typename Quantizer::template Computer<0>::dist_type>
         pool(nb, std::max(k, ef), k);
@@ -141,7 +142,7 @@ template <typename Quantizer> struct Searcher : public SearcherBase {
   }
 
   template <typename Pool, typename Computer>
-  void SearchImpl(Pool &pool, const Computer &computer) const {
+  void SearchImpl(Pool& pool, const Computer& computer) const {
     while (pool.has_next()) {
       auto u = pool.pop();
       graph.prefetch(u, graph_po);
@@ -169,8 +170,8 @@ template <typename Quantizer> struct Searcher : public SearcherBase {
   }
 };
 
-inline std::unique_ptr<SearcherBase> create_searcher(const Graph<int> &graph,
-                                                     const std::string &metric,
+inline std::unique_ptr<SearcherBase> create_searcher(const Graph<int>& graph,
+                                                     const std::string& metric,
                                                      int level = 1,
                                                      int dim = 0) {
   auto m = metric_map[metric];
@@ -207,4 +208,4 @@ inline std::unique_ptr<SearcherBase> create_searcher(const Graph<int> &graph,
   }
 }
 
-} // namespace glass
+}  // namespace glass

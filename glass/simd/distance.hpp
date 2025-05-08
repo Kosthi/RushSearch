@@ -1,11 +1,12 @@
 #pragma once
 
-#include <cstdint>
-#include <cstdio>
 #include <emmintrin.h>
 #include <immintrin.h>
 #include <smmintrin.h>
 #include <xmmintrin.h>
+
+#include <cstdint>
+#include <cstdio>
 
 #include "glass/common.hpp"
 #include "glass/simd/avx2.hpp"
@@ -14,131 +15,131 @@
 namespace glass {
 
 template <typename T1, typename T2, typename U, typename... Params>
-using Dist = U (*)(const T1 *, const T2 *, int, Params...);
+using Dist = U (*)(const T1*, const T2*, int, Params...);
 
-inline void mem_prefetch(char *ptr, const int num_lines) {
+inline void mem_prefetch(char* ptr, const int num_lines) {
   switch (num_lines) {
-  default:
-    [[fallthrough]];
-  case 28:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 27:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 26:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 25:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 24:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 23:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 22:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 21:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 20:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 19:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 18:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 17:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 16:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 15:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 14:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 13:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 12:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 11:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 10:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 9:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 8:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 7:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 6:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 5:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 4:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 3:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 2:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 1:
-    _mm_prefetch(ptr, _MM_HINT_T0);
-    ptr += 64;
-    [[fallthrough]];
-  case 0:
-    break;
+    default:
+      [[fallthrough]];
+    case 28:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 27:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 26:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 25:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 24:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 23:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 22:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 21:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 20:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 19:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 18:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 17:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 16:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 15:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 14:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 13:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 12:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 11:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 10:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 9:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 8:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 7:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 6:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 5:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 4:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 3:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 2:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 1:
+      _mm_prefetch(ptr, _MM_HINT_T0);
+      ptr += 64;
+      [[fallthrough]];
+    case 0:
+      break;
   }
 }
 
 FAST_BEGIN
-inline float L2SqrRef(const float *x, const float *y, int d) {
+inline float L2SqrRef(const float* x, const float* y, int d) {
   float sum = 0.0f;
   for (int i = 0; i < d; ++i) {
     sum += (x[i] - y[i]) * (x[i] - y[i]);
@@ -148,7 +149,7 @@ inline float L2SqrRef(const float *x, const float *y, int d) {
 FAST_END
 
 FAST_BEGIN
-inline float IPRef(const float *x, const float *y, int d) {
+inline float IPRef(const float* x, const float* y, int d) {
   float sum = 0.0f;
   for (int i = 0; i < d; ++i) {
     sum += x[i] * y[i];
@@ -157,10 +158,10 @@ inline float IPRef(const float *x, const float *y, int d) {
 }
 FAST_END
 
-inline float L2Sqr(const float *x, const float *y, int d) {
+inline float L2Sqr(const float* x, const float* y, int d) {
 #if defined(__AVX512F__)
   __m512 sum = _mm512_setzero_ps();
-  const float *end = x + d;
+  const float* end = x + d;
   while (x < end) {
     auto xx = _mm512_loadu_ps(x);
     x += 16;
@@ -172,7 +173,7 @@ inline float L2Sqr(const float *x, const float *y, int d) {
   return reduce_add_f32x16(sum);
 #elif defined(__AVX2__)
   __m256 sum = _mm256_setzero_ps();
-  const float *end = x + d;
+  const float* end = x + d;
   while (x < end) {
     auto xx = _mm256_loadu_ps(x);
     x += 8;
@@ -191,10 +192,10 @@ inline float L2Sqr(const float *x, const float *y, int d) {
 #endif
 }
 
-inline float IP(const float *x, const float *y, int d) {
+inline float IP(const float* x, const float* y, int d) {
 #if defined(__AVX512F__)
   __m512 sum = _mm512_setzero_ps();
-  const float *end = x + d;
+  const float* end = x + d;
   while (x < end) {
     auto xx = _mm512_loadu_ps(x);
     x += 16;
@@ -205,7 +206,7 @@ inline float IP(const float *x, const float *y, int d) {
   return -reduce_add_f32x16(sum);
 #elif defined(__AVX2__)
   __m256 sum = _mm256_setzero_ps();
-  const float *end = x + d;
+  const float* end = x + d;
   while (x < end) {
     auto xx = _mm256_loadu_ps(x);
     x += 8;
@@ -223,8 +224,8 @@ inline float IP(const float *x, const float *y, int d) {
 #endif
 }
 
-inline float L2SqrSQ8_ext(const float *x, const uint8_t *y, int d,
-                          const float *mi, const float *dif) {
+inline float L2SqrSQ8_ext(const float* x, const uint8_t* y, int d,
+                          const float* mi, const float* dif) {
 #if defined(__AVX512F__)
   __m512 sum = _mm512_setzero_ps();
   __m512 dot5 = _mm512_set1_ps(0.5f);
@@ -255,9 +256,8 @@ inline float L2SqrSQ8_ext(const float *x, const uint8_t *y, int d,
 #endif
 }
 
-inline float IPSQ8_ext(const float *x, const uint8_t *y, int d, const float *mi,
-                       const float *dif) {
-
+inline float IPSQ8_ext(const float* x, const uint8_t* y, int d, const float* mi,
+                       const float* dif) {
 #if defined(__AVX512F__)
   __m512 sum = _mm512_setzero_ps();
   __m512 dot5 = _mm512_set1_ps(0.5f);
@@ -286,13 +286,13 @@ inline float IPSQ8_ext(const float *x, const uint8_t *y, int d, const float *mi,
 #endif
 }
 
-inline int32_t L2SqrSQ4(const uint8_t *x, const uint8_t *y, int d) {
+inline int32_t L2SqrSQ4(const uint8_t* x, const uint8_t* y, int d) {
 #if defined(__AVX2__)
   __m256i sum1 = _mm256_setzero_si256(), sum2 = _mm256_setzero_si256();
   __m256i mask = _mm256_set1_epi8(0xf);
   for (int i = 0; i < d; i += 64) {
-    auto xx = _mm256_loadu_si256((__m256i *)(x + i / 2));
-    auto yy = _mm256_loadu_si256((__m256i *)(y + i / 2));
+    auto xx = _mm256_loadu_si256((__m256i*)(x + i / 2));
+    auto yy = _mm256_loadu_si256((__m256i*)(y + i / 2));
     auto xx1 = _mm256_and_si256(xx, mask);
     auto xx2 = _mm256_and_si256(_mm256_srli_epi16(xx, 4), mask);
     auto yy1 = _mm256_and_si256(yy, mask);
@@ -324,4 +324,4 @@ inline int32_t L2SqrSQ4(const uint8_t *x, const uint8_t *y, int d) {
 #endif
 }
 
-} // namespace glass
+}  // namespace glass

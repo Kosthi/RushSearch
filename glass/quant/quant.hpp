@@ -20,4 +20,4 @@ inline int quantizer_map_init = [] {
   return 42;
 }();
 
-} // namespace glass
+}  // namespace glass

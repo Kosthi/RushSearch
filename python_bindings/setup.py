@@ -17,12 +17,12 @@ include_dirs = [
 ]
 
 # compatibility when run in python_bindings
-bindings_dir = 'python'
+bindings_dir = 'python_bindings'
 if bindings_dir in os.path.basename(os.getcwd()):
     source_files = ['./bindings.cc']
     include_dirs.extend(['../'])
 else:
-    source_files = ['./python/bindings.cc']
+    source_files = ['./python_bindings/bindings.cc']
     include_dirs.extend(['./'])
 
 

@@ -19,10 +19,10 @@ struct NSG : public Builder {
   int L;
   int C;
   int nb;
-  float *data;
+  float* data;
   int ep;
   Graph<int> final_graph;
-  RandomGenerator rng; ///< random generator
+  RandomGenerator rng;  ///< random generator
   Dist<float, float, float> dist_func;
   int GK;
   int nndescent_S;
@@ -30,7 +30,7 @@ struct NSG : public Builder {
   int nndescent_L;
   int nndescent_iter;
 
-  explicit NSG(int dim, const std::string &metric, int R = 32, int L = 200)
+  explicit NSG(int dim, const std::string& metric, int R = 32, int L = 200)
       : d(dim), metric(metric), R(R), L(L), rng(0x0903) {
     this->C = R + 100;
     srand(0x1998);
@@ -46,7 +46,7 @@ struct NSG : public Builder {
     this->nndescent_iter = 10;
   }
 
-  void Build(float *data, int n) override {
+  void Build(float* data, int n) override {
     this->nb = n;
     this->data = data;
     NNDescent nnd(d, metric);
@@ -55,7 +55,7 @@ struct NSG : public Builder {
     nnd.L = nndescent_L;
     nnd.iters = nndescent_iter;
     nnd.Build(data, n, GK);
-    const auto &knng = nnd.final_graph;
+    const auto& knng = nnd.final_graph;
     Init(knng);
     std::vector<int> degrees(n, 0);
     {
@@ -95,7 +95,7 @@ struct NSG : public Builder {
 
   Graph<int> GetGraph() override { return final_graph; }
 
-  void Init(const Graph<int> &knng) {
+  void Init(const Graph<int>& knng) {
     std::vector<float> center(d);
     for (int i = 0; i < d; ++i) {
       center[i] = 0.0;
@@ -119,10 +119,10 @@ struct NSG : public Builder {
   }
 
   template <bool collect_fullset>
-  void search_on_graph(const float *q, const Graph<int> &graph,
-                       std::vector<bool> &vis, int ep, int pool_size,
-                       std::vector<Neighbor> &retset,
-                       std::vector<Node> &fullset) const {
+  void search_on_graph(const float* q, const Graph<int>& graph,
+                       std::vector<bool>& vis, int ep, int pool_size,
+                       std::vector<Neighbor>& retset,
+                       std::vector<Node>& fullset) const {
     RandomGenerator gen(0x1234);
     retset.resize(pool_size + 1);
     std::vector<int> init_ids(pool_size);
@@ -182,7 +182,7 @@ struct NSG : public Builder {
     }
   }
 
-  void link(const Graph<int> &knng, Graph<Node> &graph) {
+  void link(const Graph<int>& knng, Graph<Node>& graph) {
     auto st = std::chrono::high_resolution_clock::now();
     std::atomic<int> cnt{0};
 #pragma omp parallel for schedule(dynamic)
@@ -210,8 +210,8 @@ struct NSG : public Builder {
     }
   }
 
-  void sync_prune(int q, std::vector<Node> &pool, std::vector<bool> &vis,
-                  const Graph<int> &knng, Graph<Node> &graph) {
+  void sync_prune(int q, std::vector<Node>& pool, std::vector<bool>& vis,
+                  const Graph<int>& knng, Graph<Node>& graph) {
     for (int i = 0; i < knng.K; i++) {
       int id = knng.at(q, i);
       if (id < 0 || id >= nb || vis[id]) {
@@ -234,7 +234,7 @@ struct NSG : public Builder {
 
     while ((int)result.size() < R && (++start) < (int)pool.size() &&
            start < C) {
-      auto &p = pool[start];
+      auto& p = pool[start];
       bool occlude = false;
       for (int t = 0; t < (int)result.size(); t++) {
         if (p.id == result[t].id) {
@@ -263,8 +263,8 @@ struct NSG : public Builder {
     }
   }
 
-  void add_reverse_links(int q, std::vector<std::mutex> &locks,
-                         Graph<Node> &graph) {
+  void add_reverse_links(int q, std::vector<std::mutex>& locks,
+                         Graph<Node>& graph) {
     for (int i = 0; i < R; i++) {
       if (graph.at(q, i).id == EMPTY_ID) {
         break;
@@ -301,7 +301,7 @@ struct NSG : public Builder {
         result.push_back(tmp_pool[start]);
 
         while ((int)result.size() < R && (++start) < (int)tmp_pool.size()) {
-          auto &p = tmp_pool[start];
+          auto& p = tmp_pool[start];
           bool occlude = false;
           for (int t = 0; t < (int)result.size(); t++) {
             if (p.id == result[t].id) {
@@ -338,7 +338,7 @@ struct NSG : public Builder {
     }
   }
 
-  int tree_grow(std::vector<int> &degrees) {
+  int tree_grow(std::vector<int>& degrees) {
     int root = ep;
     std::vector<bool> vis(nb);
     int num_attached = 0;
@@ -355,7 +355,7 @@ struct NSG : public Builder {
     return num_attached;
   }
 
-  int dfs(std::vector<bool> &vis, int root, int cnt) const {
+  int dfs(std::vector<bool>& vis, int root, int cnt) const {
     int node = root;
     std::stack<int> stack;
     stack.push(root);
@@ -388,8 +388,8 @@ struct NSG : public Builder {
     return cnt;
   }
 
-  int attach_unlinked(std::vector<bool> &vis, std::vector<bool> &vis2,
-                      std::vector<int> &degrees) {
+  int attach_unlinked(std::vector<bool>& vis, std::vector<bool>& vis2,
+                      std::vector<int>& degrees) {
     int id = EMPTY_ID;
     for (int i = 0; i < nb; i++) {
       if (vis[i]) {
@@ -428,4 +428,4 @@ struct NSG : public Builder {
   }
 };
 
-} // namespace glass
+}  // namespace glass

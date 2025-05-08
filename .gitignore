@@ -1,5 +1,5 @@
-python/build
-python/var
+python_bindings/build
+python_bindings/var
 .cache
 **/.DS_Store
 .idea

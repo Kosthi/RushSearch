@@ -26,10 +26,10 @@ inline constexpr int64_t do_align(int64_t x, int64_t align) {
   return (x + align - 1) / align * align;
 }
 
-#define FAST_BEGIN                                                             \
-  _Pragma("GCC push_options") _Pragma(                                         \
+#define FAST_BEGIN                     \
+  _Pragma("GCC push_options") _Pragma( \
       "GCC optimize (\"unroll-loops,associative-math,no-signed-zeros\")")
 
 #define FAST_END _Pragma("GCC pop_options")
 
-} // namespace glass
+}  // namespace glass

@@ -9,7 +9,7 @@ namespace glass {
 
 using LockGuard = std::lock_guard<std::mutex>;
 
-inline void GenRandom(std::mt19937 &rng, int *addr, const int size,
+inline void GenRandom(std::mt19937& rng, int* addr, const int size,
                       const int N) {
   for (int i = 0; i < size; ++i) {
     addr[i] = rng() % (N - size);
@@ -48,4 +48,4 @@ struct RandomGenerator {
   double rand_double() { return mt() / double(mt.max()); }
 };
 
-} // namespace glass
+}  // namespace glass

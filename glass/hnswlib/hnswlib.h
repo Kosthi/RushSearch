@@ -14,6 +14,7 @@
 #if defined(USE_AVX) || defined(USE_SSE)
 #ifdef _MSC_VER
 #include <intrin.h>
+
 #include <stdexcept>
 void cpuid(int32_t out[4], int32_t eax, int32_t ecx) {
   __cpuidex(out, eax, ecx);
@@ -76,8 +77,7 @@ static uint64_t xgetbv(unsigned int index) {
 }
 
 [[maybe_unused]] static bool AVX512Capable() {
-  if (!AVXCapable())
-    return false;
+  if (!AVXCapable()) return false;
 
   int cpuInfo[4];
 
@@ -86,7 +86,7 @@ static uint64_t xgetbv(unsigned int index) {
   int nIds = cpuInfo[0];
 
   bool HW_AVX512F = false;
-  if (nIds >= 0x00000007) { //  AVX512 Foundation
+  if (nIds >= 0x00000007) {  //  AVX512 Foundation
     cpuid(cpuInfo, 0x00000007, 0);
     HW_AVX512F = (cpuInfo[1] & ((int)1 << 16)) != 0;
   }
@@ -106,9 +106,10 @@ static uint64_t xgetbv(unsigned int index) {
 }
 #endif
 
+#include <string.h>
+
 #include <iostream>
 #include <queue>
-#include <string.h>
 #include <vector>
 
 namespace hnswlib {
@@ -116,61 +117,64 @@ typedef size_t labeltype;
 
 // This can be extended to store state for filtering (e.g. from a std::set)
 class BaseFilterFunctor {
-public:
+ public:
   virtual bool operator()(hnswlib::labeltype) { return true; }
 };
 
-template <typename T> class pairGreater {
-public:
-  bool operator()(const T &p1, const T &p2) { return p1.first > p2.first; }
+template <typename T>
+class pairGreater {
+ public:
+  bool operator()(const T& p1, const T& p2) { return p1.first > p2.first; }
 };
 
 template <typename T>
-static void writeBinaryPOD(std::ostream &out, const T &podRef) {
-  out.write((char *)&podRef, sizeof(T));
+static void writeBinaryPOD(std::ostream& out, const T& podRef) {
+  out.write((char*)&podRef, sizeof(T));
 }
 
-template <typename T> static void readBinaryPOD(std::istream &in, T &podRef) {
-  in.read((char *)&podRef, sizeof(T));
+template <typename T>
+static void readBinaryPOD(std::istream& in, T& podRef) {
+  in.read((char*)&podRef, sizeof(T));
 }
 
 template <typename MTYPE>
-using DISTFUNC = MTYPE (*)(const void *, const void *, const void *);
+using DISTFUNC = MTYPE (*)(const void*, const void*, const void*);
 
-template <typename MTYPE> class SpaceInterface {
-public:
+template <typename MTYPE>
+class SpaceInterface {
+ public:
   // virtual void search(void *);
   virtual size_t get_data_size() = 0;
 
   virtual DISTFUNC<MTYPE> get_dist_func() = 0;
 
-  virtual void *get_dist_func_param() = 0;
+  virtual void* get_dist_func_param() = 0;
 
   virtual ~SpaceInterface() {}
 };
 
-template <typename dist_t> class AlgorithmInterface {
-public:
-  virtual void addPoint(const void *datapoint, labeltype label,
+template <typename dist_t>
+class AlgorithmInterface {
+ public:
+  virtual void addPoint(const void* datapoint, labeltype label,
                         bool replace_deleted = false) = 0;
 
-  virtual std::priority_queue<std::pair<dist_t, labeltype>>
-  searchKnn(const void *, size_t,
-            BaseFilterFunctor *isIdAllowed = nullptr) const = 0;
+  virtual std::priority_queue<std::pair<dist_t, labeltype>> searchKnn(
+      const void*, size_t, BaseFilterFunctor* isIdAllowed = nullptr) const = 0;
 
   // Return k nearest neighbor in the order of closer fist
-  virtual std::vector<std::pair<dist_t, labeltype>>
-  searchKnnCloserFirst(const void *query_data, size_t k,
-                       BaseFilterFunctor *isIdAllowed = nullptr) const;
+  virtual std::vector<std::pair<dist_t, labeltype>> searchKnnCloserFirst(
+      const void* query_data, size_t k,
+      BaseFilterFunctor* isIdAllowed = nullptr) const;
 
-  virtual void saveIndex(const std::string &location) = 0;
+  virtual void saveIndex(const std::string& location) = 0;
   virtual ~AlgorithmInterface() {}
 };
 
 template <typename dist_t>
 std::vector<std::pair<dist_t, labeltype>>
 AlgorithmInterface<dist_t>::searchKnnCloserFirst(
-    const void *query_data, size_t k, BaseFilterFunctor *isIdAllowed) const {
+    const void* query_data, size_t k, BaseFilterFunctor* isIdAllowed) const {
   std::vector<std::pair<dist_t, labeltype>> result;
 
   // here searchKnn returns the result in the order of further first
@@ -186,7 +190,7 @@ AlgorithmInterface<dist_t>::searchKnnCloserFirst(
 
   return result;
 }
-} // namespace hnswlib
+}  // namespace hnswlib
 
 #include "hnswalg.h"
 #include "space_ip.h"

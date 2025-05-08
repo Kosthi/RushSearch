@@ -1,15 +1,16 @@
 #pragma once
 
-#include "glass/hnsw/HNSWInitializer.hpp"
+#include <chrono>
+#include <memory>
+
 #include "glass/builder.hpp"
 #include "glass/common.hpp"
 #include "glass/graph.hpp"
+#include "glass/hnsw/HNSWInitializer.hpp"
+#include "glass/hnswlib/hnswalg.h"
 #include "glass/hnswlib/hnswlib.h"
 #include "glass/hnswlib/space_ip.h"
 #include "glass/hnswlib/space_l2.h"
-#include "glass/hnswlib/hnswalg.h"
-#include <chrono>
-#include <memory>
 
 namespace glass {
 
@@ -21,7 +22,7 @@ struct HNSW : public Builder {
 
   Graph<int> final_graph;
 
-  HNSW(int dim, const std::string &metric, int R = 32, int L = 200)
+  HNSW(int dim, const std::string& metric, int R = 32, int L = 200)
       : dim(dim), M(R / 2), efConstruction(L) {
     auto m = metric_map[metric];
     if (m == Metric::L2) {
@@ -33,7 +34,7 @@ struct HNSW : public Builder {
     }
   }
 
-  void Build(float *data, int N) override {
+  void Build(float* data, int N) override {
     nb = N;
     hnsw = std::make_unique<hnswlib::HierarchicalNSW<float>>(space.get(), N, M,
                                                              efConstruction);
@@ -54,7 +55,7 @@ struct HNSW : public Builder {
     final_graph.init(nb, 2 * M);
 #pragma omp parallel for
     for (int i = 0; i < nb; ++i) {
-      int *edges = (int *)hnsw->get_linklist0(i);
+      int* edges = (int*)hnsw->get_linklist0(i);
       for (int j = 1; j <= edges[0]; ++j) {
         final_graph.at(i, j - 1) = edges[j];
       }
@@ -67,7 +68,7 @@ struct HNSW : public Builder {
       if (level > 0) {
         initializer->lists[i].assign(level * M, -1);
         for (int j = 1; j <= level; ++j) {
-          int *edges = (int *)hnsw->get_linklist(i, j);
+          int* edges = (int*)hnsw->get_linklist(i, j);
           for (int k = 1; k <= edges[0]; ++k) {
             initializer->at(j, i, k - 1) = edges[k];
           }
@@ -79,4 +80,4 @@ struct HNSW : public Builder {
 
   Graph<int> GetGraph() override { return final_graph; }
 };
-} // namespace glass
+}  // namespace glass

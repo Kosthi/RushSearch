@@ -1,10 +1,11 @@
 #pragma once
 
+#include <omp.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <mutex>
-#include <omp.h>
 #include <string>
 #include <vector>
 
@@ -17,19 +18,19 @@ namespace glass {
 
 struct NNDescent {
   struct Nhood {
-    std::vector<Neighbor> pool; // candidate pool (a max heap)
+    std::vector<Neighbor> pool;  // candidate pool (a max heap)
     int M;
     std::mutex lock;
     std::vector<int> nn_new, nn_old;
     std::vector<int> rnn_new, rnn_old;
 
-    Nhood(std::mt19937 &rng, int s, int64_t N) {
+    Nhood(std::mt19937& rng, int s, int64_t N) {
       M = s;
       nn_new.resize(s * 2);
       GenRandom(rng, nn_new.data(), (int)nn_new.size(), N);
     }
 
-    Nhood &operator=(const Nhood &other) {
+    Nhood& operator=(const Nhood& other) {
       M = other.M;
       std::copy(other.nn_new.begin(), other.nn_new.end(),
                 std::back_inserter(nn_new));
@@ -38,7 +39,7 @@ struct NNDescent {
       return *this;
     }
 
-    Nhood(const Nhood &other) {
+    Nhood(const Nhood& other) {
       M = other.M;
       std::copy(other.nn_new.begin(), other.nn_new.end(),
                 std::back_inserter(nn_new));
@@ -48,11 +49,9 @@ struct NNDescent {
 
     void insert(int id, float dist) {
       std::scoped_lock guard(lock);
-      if (dist > pool.front().distance)
-        return;
+      if (dist > pool.front().distance) return;
       for (int i = 0; i < (int)pool.size(); i++) {
-        if (id == pool[i].id)
-          return;
+        if (id == pool[i].id) return;
       }
       if (pool.size() < pool.capacity()) {
         pool.push_back(Neighbor(id, dist, true));
@@ -64,7 +63,8 @@ struct NNDescent {
       }
     }
 
-    template <typename C> void join(C callback) const {
+    template <typename C>
+    void join(C callback) const {
       for (int const i : nn_new) {
         for (int const j : nn_new) {
           if (i < j) {
@@ -82,7 +82,7 @@ struct NNDescent {
   Graph<int> final_graph;
   int64_t d;
   int64_t nb;
-  const float *data;
+  const float* data;
   int K;
   int S = 10;
   int R = 100;
@@ -91,7 +91,7 @@ struct NNDescent {
   int L;
   Dist<float, float, float> dist_func;
 
-  NNDescent(int64_t dim, const std::string &metric) : d(dim) {
+  NNDescent(int64_t dim, const std::string& metric) : d(dim) {
     if (metric == "L2") {
       dist_func = L2SqrRef;
     } else if (metric == "IP") {
@@ -99,7 +99,7 @@ struct NNDescent {
     }
   }
 
-  void Build(const float *data, int n, int K) {
+  void Build(const float* data, int n, int K) {
     this->data = data;
     this->nb = n;
     this->K = K;
@@ -133,8 +133,7 @@ struct NNDescent {
         GenRandom(rng, tmp.data(), S, nb);
         for (int j = 0; j < S; j++) {
           int id = tmp[j];
-          if (id == i)
-            continue;
+          if (id == i) continue;
           float dist = dist_func(data + i * d, data + id * d, d);
           graph[i].pool.push_back(Neighbor(id, dist, true));
         }
@@ -184,7 +183,7 @@ struct NNDescent {
     }
 #pragma omp parallel for
     for (int n = 0; n < nb; ++n) {
-      auto &nn = graph[n];
+      auto& nn = graph[n];
       std::sort(nn.pool.begin(), nn.pool.end());
       if ((int)nn.pool.size() > L) {
         nn.pool.resize(L);
@@ -194,8 +193,7 @@ struct NNDescent {
       int c = 0;
       int l = 0;
       while ((l < maxl) && (c < S)) {
-        if (nn.pool[l].flag)
-          ++c;
+        if (nn.pool[l].flag) ++c;
         ++l;
       }
       nn.M = l;
@@ -205,12 +203,12 @@ struct NNDescent {
       std::mt19937 rng(random_seed * 5081 + omp_get_thread_num());
 #pragma omp for
       for (int n = 0; n < nb; ++n) {
-        auto &node = graph[n];
-        auto &nn_new = node.nn_new;
-        auto &nn_old = node.nn_old;
+        auto& node = graph[n];
+        auto& nn_new = node.nn_new;
+        auto& nn_old = node.nn_old;
         for (int l = 0; l < node.M; ++l) {
-          auto &nn = node.pool[l];
-          auto &other = graph[nn.id];
+          auto& nn = node.pool[l];
+          auto& other = graph[nn.id];
           if (nn.flag) {
             nn_new.push_back(nn.id);
             if (nn.distance > other.pool.back().distance) {
@@ -241,10 +239,10 @@ struct NNDescent {
     }
 #pragma omp parallel for
     for (int i = 0; i < nb; ++i) {
-      auto &nn_new = graph[i].nn_new;
-      auto &nn_old = graph[i].nn_old;
-      auto &rnn_new = graph[i].rnn_new;
-      auto &rnn_old = graph[i].rnn_old;
+      auto& nn_new = graph[i].nn_new;
+      auto& nn_old = graph[i].nn_old;
+      auto& rnn_new = graph[i].rnn_new;
+      auto& rnn_old = graph[i].rnn_old;
       nn_new.insert(nn_new.end(), rnn_new.begin(), rnn_new.end());
       nn_old.insert(nn_old.end(), rnn_old.begin(), rnn_old.end());
       if ((int)nn_old.size() > R * 2) {
@@ -256,14 +254,13 @@ struct NNDescent {
     }
   }
 
-  void GenEvalGt(const std::vector<int> &eval_set,
-                 std::vector<std::vector<int>> &eval_gt) {
+  void GenEvalGt(const std::vector<int>& eval_set,
+                 std::vector<std::vector<int>>& eval_gt) {
 #pragma omp parallel for
     for (int i = 0; i < (int)eval_set.size(); i++) {
       std::vector<Neighbor> tmp;
       for (int j = 0; j < nb; j++) {
-        if (eval_set[i] == j)
-          continue;
+        if (eval_set[i] == j) continue;
         float dist = dist_func(data + eval_set[i] * d, data + j * d, d);
         tmp.push_back(Neighbor(j, dist, true));
       }
@@ -274,13 +271,13 @@ struct NNDescent {
     }
   }
 
-  float EvalRecall(const std::vector<int> &eval_set,
-                   const std::vector<std::vector<int>> &eval_gt) {
+  float EvalRecall(const std::vector<int>& eval_set,
+                   const std::vector<std::vector<int>>& eval_gt) {
     float mean_acc = 0.0f;
     for (int i = 0; i < (int)eval_set.size(); i++) {
       float acc = 0;
-      std::vector<Neighbor> &g = graph[eval_set[i]].pool;
-      const std::vector<int> &v = eval_gt[i];
+      std::vector<Neighbor>& g = graph[eval_set[i]].pool;
+      const std::vector<int>& v = eval_gt[i];
       for (int j = 0; j < (int)g.size(); j++) {
         for (int k = 0; k < (int)v.size(); k++) {
           if (g[j].id == v[k]) {
@@ -295,4 +292,4 @@ struct NNDescent {
   }
 };
 
-} // namespace glass
+}  // namespace glass
