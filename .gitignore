@@ -1,0 +1,6 @@
+python/build
+python/var
+.cache
+**/.DS_Store
+.idea
+cmake-build-debug-gcc-14
