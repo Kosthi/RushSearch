@@ -4,3 +4,5 @@ python_bindings/var
 **/.DS_Store
 .idea
 cmake-build-debug-gcc-14
+cmake-build-debug-ubuntu2204
+cmake-build-release-ubuntu2204

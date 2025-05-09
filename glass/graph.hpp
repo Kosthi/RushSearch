@@ -60,7 +60,7 @@ struct Graph {
   node_t& at(int i, int j) { return data[i * K + j]; }
 
   void prefetch(int u, int lines) const {
-    mem_prefetch((char*)edges(u), lines);
+    mem_prefetch<prefetch_L1>((char*)edges(u), lines);
   }
 
   template <typename Pool, typename Computer>

@@ -11,27 +11,28 @@
 #include "glass/searcher.hpp"
 
 template <typename T>
-void load_fvecs(const char *filename, T *&p, int64_t &n, int64_t &dim) {
+void load_fvecs(const char* filename, T*& p, int64_t& n, int64_t& dim) {
   std::ifstream fs(filename, std::ios::binary);
   int dim_32;
-  fs.read((char *)&dim_32, 4);
+  fs.read((char*)&dim_32, 4);
   dim = dim_32;
   fs.seekg(0, std::ios::end);
   n = fs.tellg() / (4 + dim * sizeof(T));
   fs.seekg(0, std::ios::beg);
   std::cout << "Read path: " << filename << ", nx: " << n << ", dim: " << dim
             << std::endl;
-  p = reinterpret_cast<T *>(aligned_alloc(64, n * dim * sizeof(T)));
+  p = reinterpret_cast<T*>(aligned_alloc(64, n * dim * sizeof(T)));
   for (int i = 0; i < n; ++i) {
     fs.seekg(4, std::ios::cur);
-    fs.read((char *)&p[i * dim], dim * sizeof(T));
+    fs.read((char*)&p[i * dim], dim * sizeof(T));
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc < 8) {
-    printf("Usage: ./main base_path query_path gt_path graph_path level "
-           "topk search_ef num_threads\n");
+    printf(
+        "Usage: ./main base_path query_path gt_path graph_path level "
+        "topk search_ef num_threads\n");
     exit(-1);
   }
   std::string base_path = argv[1];
@@ -50,7 +51,7 @@ int main(int argc, char **argv) {
     iters = std::stoi(argv[9]);
   }
   float *base, *query;
-  int *gt;
+  int* gt;
   int64_t N, dim, nq, gt_k;
   load_fvecs(base_path.c_str(), base, N, dim);
   load_fvecs(query_path.c_str(), query, nq, dim);

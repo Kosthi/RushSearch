@@ -54,7 +54,7 @@ struct FP32Quantizer {
       return dist_func(q, (data_type*)quant.get_data(u), quant.d);
     }
     void prefetch(int u, int lines) const {
-      mem_prefetch(quant.get_data(u), lines);
+      mem_prefetch<prefetch_L1>(quant.get_data(u), lines);
     }
   };
 

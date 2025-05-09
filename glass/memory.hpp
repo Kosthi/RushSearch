@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __linux__
+#include <sys/mman.h>
+#endif
+
 #include <cstdlib>
 #include <cstring>
 
@@ -17,7 +21,6 @@ struct align_alloc {
     int sz = (n * sizeof(T) + (1 << 21) - 1) >> 21 << 21;
     ptr = (T*)std::aligned_alloc(1 << 21, sz);
 #ifdef __linux__
-#include <sys/mman.h>
     madvise(ptr, sz, MADV_HUGEPAGE);
 #endif
     return ptr;

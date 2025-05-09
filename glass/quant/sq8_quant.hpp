@@ -95,7 +95,7 @@ struct SQ8Quantizer {
                        dif);
     }
     void prefetch(int u, int lines) const {
-      mem_prefetch(quant.get_data(u), lines);
+      mem_prefetch<prefetch_L1>(quant.get_data(u), lines);
     }
   };
 

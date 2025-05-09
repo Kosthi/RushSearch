@@ -99,7 +99,7 @@ struct SQ4Quantizer {
       return dist_func(q, (data_type*)quant.get_data(u), quant.d_align);
     }
     void prefetch(int u, int lines) const {
-      mem_prefetch(quant.get_data(u), lines);
+      mem_prefetch<prefetch_L1>(quant.get_data(u), lines);
     }
   };
 

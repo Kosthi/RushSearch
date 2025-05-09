@@ -1,9 +1,8 @@
 #pragma once
 
-#include <emmintrin.h>
-#include <immintrin.h>
-#include <smmintrin.h>
-#include <xmmintrin.h>
+#if defined(__x86_64__)
+#include <xmmintrin.h>  // SSE
+#endif
 
 #include <cstdint>
 #include <cstdio>
@@ -17,120 +16,145 @@ namespace glass {
 template <typename T1, typename T2, typename U, typename... Params>
 using Dist = U (*)(const T1*, const T2*, int, Params...);
 
+inline void prefetch_L1(const void* address) {
+#if defined(__x86_64__)
+  _mm_prefetch((const char*)address, _MM_HINT_T0);
+#else
+  __builtin_prefetch(address, 0, 3);
+#endif
+}
+
+inline void prefetch_L2(const void* address) {
+#if defined(__x86_64__)
+  _mm_prefetch((const char*)address, _MM_HINT_T1);
+#else
+  __builtin_prefetch(address, 0, 2);
+#endif
+}
+
+inline void prefetch_L3(const void* address) {
+#if defined(__x86_64__)
+  _mm_prefetch((const char*)address, _MM_HINT_T2);
+#else
+  __builtin_prefetch(address, 0, 1);
+#endif
+}
+
+template <auto PrefetchFunc>
 inline void mem_prefetch(char* ptr, const int num_lines) {
   switch (num_lines) {
     default:
       [[fallthrough]];
     case 28:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 27:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 26:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 25:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 24:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 23:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 22:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 21:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 20:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 19:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 18:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 17:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 16:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 15:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 14:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 13:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 12:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 11:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 10:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 9:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 8:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 7:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 6:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 5:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 4:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 3:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 2:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 1:
-      _mm_prefetch(ptr, _MM_HINT_T0);
+      PrefetchFunc(ptr);
       ptr += 64;
       [[fallthrough]];
     case 0:
